@@ -4,7 +4,7 @@
       <div class="q-mb-xl">
         <q-input v-model="tempData.name" label="姓名" />
         <q-input v-model="tempData.age" label="年齡" />
-        <q-btn color="primary" class="q-mt-md">新增</q-btn>
+        <q-btn color="primary" class="q-mt-md" @click="handleAdd">新增</q-btn>
       </div>
 
       <q-table
@@ -80,11 +80,16 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { QTableProps } from 'quasar';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 interface btnType {
   label: string;
   icon: string;
   status: string;
+}
+interface dataType {
+  id: string;
+  name: string;
+  age: number;
 }
 const blockData = ref([
   {
@@ -123,9 +128,62 @@ const tempData = ref({
   name: '',
   age: '',
 });
-function handleClickOption(btn, data) {
-  // ...
+
+const getURL = 'https://dahua.metcfire.com.tw/api/CRUDTest/a';
+const postURL = 'https://dahua.metcfire.com.tw/api/CRUDTest';
+function handleClickOption(btn: btnType, data: dataType) {
+  if (btn.status === 'edit') {
+    const newData = {
+      id: data.id,
+      name: tempData.value.name,
+      age: tempData.value.age,
+    };
+    axios
+      .patch(postURL, newData)
+      .then((res) => {
+        if (res.data) {
+          getData();
+        }
+      })
+      .catch((err) => console.error(err));
+  }
+  if (btn.status === 'delete') {
+    axios
+      .delete(`${postURL}/${data.id}`)
+      .then((res) => {
+        if (res.data) {
+          getData();
+        }
+      })
+      .catch((err) => console.error(err));
+  }
 }
+
+function handleAdd() {
+  axios
+    .post(postURL, tempData.value)
+    .then((res) => {
+      if (res.data) {
+        getData();
+      }
+    })
+    .catch((err) => console.error(err));
+}
+
+function getData() {
+  axios
+    .get(getURL)
+    .then((res) => {
+      blockData.value = res.data;
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+onMounted(() => {
+  getData();
+});
 </script>
 
 <style lang="scss" scoped>
