@@ -2,8 +2,16 @@
   <q-page class="row q-pt-xl">
     <div class="full-width q-px-xl">
       <div class="q-mb-xl">
-        <q-input v-model="tempData.name" label="姓名" />
-        <q-input v-model="tempData.age" label="年齡" />
+        <q-input
+          v-model="tempData.name"
+          label="姓名"
+          :rules="[(val) => !!val || '請填寫姓名']"
+        />
+        <q-input
+          v-model="tempData.age"
+          label="年齡"
+          :rules="[(val) => !!val || '請填寫年齡']"
+        />
         <q-btn color="primary" class="q-mt-md" @click="handleAdd">新增</q-btn>
       </div>
 
@@ -131,6 +139,7 @@ const tempData = ref({
 
 const getURL = 'https://dahua.metcfire.com.tw/api/CRUDTest/a';
 const postURL = 'https://dahua.metcfire.com.tw/api/CRUDTest';
+
 function handleClickOption(btn: btnType, data: dataType) {
   if (btn.status === 'edit') {
     const newData = {
